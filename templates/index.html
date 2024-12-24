@@ -2,13 +2,24 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title></title>
-    <link href="css/style.css" rel="stylesheet" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %} {% endblock %} - MyTodoSite</title>
+    {% block meta %}{% endblock %}
+    <link rel="stylesheet" href="/static/css/global.css" />
+    <link rel="shortcut icon" href="/static/img/favicon.png" type="image/png" />
   </head>
+
   <body>
-    <main>
-      <h1>I'am from Axum</h1>
-    </main>
+    <header>
+      <nav>
+        <a href="/">Home</a>
+        <a href="/create">Create</a>
+        <a href="/todos">Todos</a>
+        <a href="/sign-up">Sign Up</a>
+        <a href="/log-in">Log-in</a>
+      </nav>
+    </header>
+
+    <main>{% block main %} {% endblock %}</main>
   </body>
 </html>

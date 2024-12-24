@@ -1,24 +1,20 @@
-use askama::Template;
-use axum::{
-    response::{Html, IntoResponse, Response},
-    routing::get,
-    Router,
-};
+use axum_askama::{init, routes};
 
 #[tokio::main]
 async fn main() {
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:8000").await.unwrap();
-    let app = Router::new().route("/", get(home));
+    let addr = "127.0.0.1:8000";
+    let listener = tokio::net::TcpListener::bind(addr)
+        .await
+        .expect("Failed to bind address");
 
-    axum::serve(listener, app).await.unwrap();
+    init::logging();
+
+    tracing::info!("Server is starting...");
+    tracing::info!("Listening at {addr}");
+
+    let app = routes::router();
+
+    axum::serve(listener, app)
+        .await
+        .expect("Failed to start the server")
 }
-
-async fn home() -> Response {
-    let html_string = HomeTemplate {}.render().unwrap();
-
-    Html(html_string).into_response()
-}
-
-#[derive(Template)]
-#[template(path = "index.html")]
-struct HomeTemplate {}
