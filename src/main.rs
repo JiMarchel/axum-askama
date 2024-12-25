@@ -8,6 +8,7 @@ async fn main() {
         .expect("Failed to bind address");
 
     init::logging();
+    init::database_connection().await;
 
     tracing::info!("Server is starting...");
     tracing::info!("Listening at {addr}");

@@ -5,7 +5,7 @@ use tower_http::{classify::ServerErrorsFailureClass, services::ServeDir, trace::
 use tracing::Span;
 
 use crate::handlers::{
-    auth::{log_in_handler, sign_up_handler},
+    auth::{log_in_handler, post_sign_up_handler, sign_up_handler},
     public::home,
     todos::{create_todo_handler, todos_handler},
 };
@@ -17,7 +17,7 @@ pub fn router() -> Router {
         .route("/", get(home))
         .route("/create", get(create_todo_handler))
         .route("/todos", get(todos_handler))
-        .route("/sign-up", get(sign_up_handler))
+        .route("/sign-up", get(sign_up_handler).post(post_sign_up_handler))
         .route("/log-in", get(log_in_handler))
         .nest_service("/static", server_dir)
         .layer(
@@ -31,7 +31,7 @@ pub fn router() -> Router {
 
 fn on_request(request: &Request<Body>, _: &Span) {
     tracing::info!(
-        "Request started: method {} path {}",
+        "->> Request started: method {} path {}",
         request.method(),
         request.uri().path()
     )
@@ -39,12 +39,12 @@ fn on_request(request: &Request<Body>, _: &Span) {
 
 fn on_response(response: &Response<Body>, latency: Duration, _: &Span) {
     tracing::info!(
-        "Response generated: status {} in {:?}",
+        "<<- Response generated: status {} in {:?}",
         response.status(),
         latency
     )
 }
 
 fn on_failure(error: ServerErrorsFailureClass, latency: Duration, _: &Span) {
-    tracing::error!("Request failed: {:?} after {:?}", error, latency)
+    tracing::error!("-X- Request failed: {:?} after {:?}", error, latency)
 }
