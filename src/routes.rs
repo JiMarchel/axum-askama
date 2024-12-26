@@ -4,13 +4,16 @@ use axum::{body::Body, extract::Request, response::Response, routing::get, Route
 use tower_http::{classify::ServerErrorsFailureClass, services::ServeDir, trace::TraceLayer};
 use tracing::Span;
 
-use crate::handlers::{
-    auth::{log_in_handler, post_sign_up_handler, sign_up_handler},
-    public::home,
-    todos::{create_todo_handler, todos_handler},
+use crate::{
+    handlers::{
+        auth::{log_in_handler, post_sign_up_handler, sign_up_handler},
+        public::home,
+        todos::{create_todo_handler, todos_handler},
+    },
+    models::app::AppState,
 };
 
-pub fn router() -> Router {
+pub fn router(app_state: AppState) -> Router {
     let server_dir = ServeDir::new("static");
 
     Router::new()
@@ -20,6 +23,7 @@ pub fn router() -> Router {
         .route("/sign-up", get(sign_up_handler).post(post_sign_up_handler))
         .route("/log-in", get(log_in_handler))
         .nest_service("/static", server_dir)
+        .with_state(app_state)
         .layer(
             TraceLayer::new_for_http()
                 .make_span_with(|_: &Request<Body>| tracing::info_span!("http-request"))
